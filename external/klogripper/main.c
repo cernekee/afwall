@@ -79,15 +79,16 @@ int main(int argc, char ** argv) {
 		bytes_read = klogctl(SYSLOG_ACTION_READ_ALL, buffer, bytes_total);
 		if (bytes_read < 0)
 			die("SYSLOG_ACTION_READ_ALL returned %d\n", errno);
-		printf("%s", buffer);
+		if (write(fileno(stdout), buffer, bytes_read) < bytes_read)
+			return 1;
 	}
 
 	for (;;) {
 		bytes_read = klogctl(SYSLOG_ACTION_READ, buffer, bytes_total);
 		if (bytes_read < 0)
 			die("SYSLOG_ACTION_READ returned %d\n", errno);
-		buffer[bytes_read] = '\0';
-		printf("%s", buffer);
+		if (write(fileno(stdout), buffer, bytes_read) < bytes_read)
+			return 1;
 	}
 
 	return 0;
